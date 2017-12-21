@@ -1,8 +1,8 @@
 // config/passport.js
 
-const LocalStrategy = require("passport-local").Strategy;
+var LocalStrategy = require("passport-local").Strategy;
 
-const User = require("../models/User");
+var User = require("../models/User");
 
 module.exports = function (passport) {
 
@@ -34,7 +34,7 @@ module.exports = function (passport) {
                         if (user) {
                             return done(null, false, "That email is already in use");
                         } else {
-                            const newUser = new User();
+                            var newUser = new User();
                             newUser.local.email = email;
                             newUser.local.password = newUser.generateHash(password);
 
