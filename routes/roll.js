@@ -1,7 +1,7 @@
 // routes/dice
 
 module.exports = function (app) {
-    app.get("/roll", function (req, res) {
+    app.get("/api/roll", function (req, res) {
         const rolls = {
             dice: [],
             total: 0

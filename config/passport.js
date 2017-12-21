@@ -1,6 +1,8 @@
 // config/passport.js
 
 var LocalStrategy = require("passport-local").Strategy;
+var JwtStrategy = require("passport-jwt").Strategy;
+var ExtractJwt = require("passport-jwt").ExtractJwt;
 
 var User = require("../models/User");
 
@@ -16,38 +18,82 @@ module.exports = function (passport) {
         });
     });
 
+    var opts = {};
+    opts.jwtFromRequest = ExtractJwt.fromHeader("jwt");
+    opts.secretOrKey = process.env.SECRET || "thereisnosecret";
+    passport
+        .use(new JwtStrategy(opts, function (jwt_payload, done) {
+            User.findOne({username: jwt_payload}, function (err, user) {
+                if (err) {
+                    return done(err, false);
+                }
+                if (user) {
+                    done(null, user);
+                } else {
+                    done(null, false);
+                }
+            });
+        }));
+
+    passport
+        .use(new LocalStrategy(
+            {
+                passReqToCallback: true,
+                session: true
+            },
+            function (req, email, password, done) { // callback with email and password from our form
+
+                User
+                    .findOne({"local.email": email}, function (err, user) {
+                        // if there are any errors, return the error before anything else
+                        if (err)
+                            return done(err);
+
+                        // if no user is found, return the message
+                        if (!user)
+                            return done(null, false); // req.flash is the way to set flashdata using connect-flash
+
+                        // if the user is found but the password is wrong
+                        if (!user.validPassword(password))
+                            return done(null, false); // create the loginMessage and save it to session as flashdata
+
+                        // all is well, return successful user
+                        return done(null, user);
+                    });
+
+            }));
+
     // Local
     passport
         .use("local-signup", new LocalStrategy(
             {
-                usernameField: "email",
-                passwordField: "password",
                 passReqToCallback: true
             },
-            function (req, email, password, done) {
+            function (req, username, password, done) {
                 process.nextTick(function () {
-                    User.findOne({"local.email": email}, function (err, user) {
-                        if (err) {
-                            return done(err);
-                        }
+                    User
+                        .findOne({"local.email": req.body.email}, function (err, user) {
+                            if (err) {
+                                return done(err);
+                            }
 
-                        if (user) {
-                            return done(null, false, "That email is already in use");
-                        } else {
-                            var newUser = new User();
-                            newUser.local.email = email;
-                            newUser.local.password = newUser.generateHash(password);
+                            if (user) {
+                                return done(null, false, {success: false, message: "That email is already in use"});
+                            } else {
+                                var newUser = new User();
+                                newUser.username = username;
+                                newUser.local.email = req.body.email;
+                                newUser.local.password = newUser.generateHash(password);
 
-                            newUser.save(function (err) {
-                                if (err) {
-                                    throw err;
-                                }
-                                return done(null, newUser);
-                            });
-                        }
-                    });
+                                newUser.save(function (err) {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    return done(null, newUser);
+                                });
+                            }
+                        });
                 });
             }));
-
 };
 

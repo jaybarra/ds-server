@@ -23,18 +23,17 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-
-// passport
 app.use(session({
-    secret: "to understand nothing takes time",
+    secret: process.env.SECRET || "to understand nothing takes time",
     saveUninitialized: false,
-    resave: true
+    resave: false,
+    cookie: {maxAge: 60000, secure: true}
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 // Routes ==============================================================================================================
+
 require("./routes")(app, passport);
 
 // catch 404 and forward to error handler
