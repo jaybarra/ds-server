@@ -107,4 +107,5 @@ module.exports = function (app, passport) {
     });
 
     require("./roll")(app);
+    require("./charater")(app, passport);
 };
