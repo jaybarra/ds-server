@@ -5,6 +5,21 @@ var Character = require("../models/Character");
 
 module.exports = function (app, passport) {
 
+    app.get("/api/character", passport.authenticate("jwt", {session: false}), function (req, res) {
+        Character
+            .find({
+                owner: req.user
+            })
+            .skip(isNaN(req.query.offset) ? 0 : parseInt(req.query.offset))
+            .limit(isNaN(req.query.limit) ? 20 : parseInt(req.query.limit))
+            .exec(function (err, characters) {
+                if (err) {
+                    throw err;
+                }
+                res.json(characters);
+            });
+    });
+
     app.get("/api/character/:name", passport.authenticate("jwt", {session: false}), function (req, res) {
         Character
             .findOne({
@@ -65,10 +80,59 @@ module.exports = function (app, passport) {
 
     // Update a character
     app.put("/api/character", passport.authenticate("jwt", {session: false}), function (req, res) {
-        res.status(500).json({success: false, message: "Updates not supported yet"});
+        var query = {
+            $and: [
+                {owner: req.user},
+                {
+                    $or:
+                        [
+                            {name: req.body.name},
+                            {_id: req.body._id}
+                        ]
+                }
+            ]
+        };
+
+        Character
+            .findOneAndUpdate(query, req.body, {upsert: false, new: true}, function (err, character) {
+                if (err) {
+                    throw err;
+                }
+                if (!character) {
+                    res.status(400).json({
+                        success: false,
+                        message: "Character not found"
+                    });
+                } else {
+                    res.json(character);
+                }
+            });
     });
 
     app.delete("/api/character", passport.authenticate("jwt", {session: false}), function (req, res) {
-        res.status(500).json({success: false, message: "Deletes not supported yet"});
+        var query = {
+            $and: [
+                {owner: req.user},
+                {
+                    $or:
+                        [
+                            {name: req.body.name},
+                            {_id: req.body._id}
+                        ]
+                }
+            ]
+        };
+
+        Character.findOne(query, function (err, character) {
+            if (err) {
+                throw err;
+            }
+            if (!character) {
+                res.status(400).json({success: false, message: "Character not found"});
+            } else {
+                character.remove();
+                res.sendStatus(200);
+            }
+        });
     });
 };

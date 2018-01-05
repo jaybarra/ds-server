@@ -6,9 +6,11 @@ var Schema = mongoose.Schema;
 var characterSchema = mongoose.Schema({
     name: {type: String, required: true},
     owner: {type: Schema.Types.ObjectId, ref: "User", required: true},
+    created: {type: Date, default: Date.now},
     campaigns: [{type: Schema.Types.ObjectId, ref: "Campaign"}],
-    description: {
-        background: String,
+    description: String,
+    bio: {
+        background: {type: String},
         personalityTraits: String,
         ideals: String,
         bonds: String,
@@ -17,171 +19,176 @@ var characterSchema = mongoose.Schema({
         languages: [String],
         otherProficiencies: [String]
     },
-    background: String,
     alignment: String,
-    age: Number,
+    age: {type: Number, min: 0},
     class: String,
-    level: Number,
-    race: String,
+    level: {type: Number, min: 0, default: 0},
+    race: {type: String, default: "Human"},
     sex: String,
     inventory: {
         money: {
-            platinum: Number,
-            gold: Number,
-            silver: Number,
-            copper: Number,
-            jewels: [String]
+            platinum: {type: Number, min: 0},
+            gold: {type: Number, min: 0},
+            electrum: {type: Number, min: 0},
+            silver: {type: Number, min: 0},
+            copper: {type: Number, min: 0},
+            other: [{
+                name: String,
+                quantity: {type: Number},
+                description: String,
+                value: {type: Number}
+            }]
         },
         items: [{
             name: String,
-            quantity: Number,
+            quantity: {type: Number},
             description: String
         }]
 
     },
-    experience: Number,
+    experience: {type: Number},
     stats: {
         strength: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
         dexterity: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
         constitution: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
         intelligence: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
         wisdom: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
         charisma: {
-            value: Number,
-            modifier: Number
+            value: {type: Number},
+            modifier: {type: Number}
         },
-        passiveWisdom: Number
+        passiveWisdom: {type: Number}
     },
     skills: {
         acrobatics: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         animalHandling: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         arcana: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         athletics: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         deception: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         history: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         insight: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         intimidation: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         investigation: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         medicine: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         nature: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         perception: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         performance: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         persuasion: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         religion: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         sleightOfHand: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         stealth: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         },
         survival: {
             selected: Boolean,
-            value: Number
+            value: {type: Number}
         }
     },
     savingThrows: {
         strength: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         },
         dexterity: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         },
         constitution: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         },
         intelligence: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         },
         wisdom: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         },
         charisma: {
-            value: Number,
+            value: {type: Number},
             selected: Boolean
         }
     },
     combat: {
-        armorClass: Number,
-        initiative: Number,
-        speed: Number,
-        currentHitPoints: Number,
-        temporaryHitPoints: Number,
+        armorClass: {type: Number},
+        initiative: {type: Number},
+        speed: {type: Number},
+        currentHitPoints: {type: Number},
+        temporaryHitPoints: {type: Number},
         activeEffects: [String],
         passiveEffects: [String],
         hitDice: {
-            total: Number,
+            total: {type: Number},
             dice: [{
-                number: Number,
-                die: Number
+                number: {type: Number},
+                die: {type: Number}
             }],
-            remaining: Number
+            remaining: {type: Number}
         },
         deathSaves: {
             successes: {type: Number, min: 0},
@@ -190,16 +197,16 @@ var characterSchema = mongoose.Schema({
         attacks: {
             spells: [{
                 name: String,
-                level: Number,
+                level: {type: Number, min: 0},
                 description: String
             }],
             weapons: [{
                 name: String,
                 twoHanded: Boolean,
-                attackBonus: Number,
+                attackBonus: {type: Number},
                 damage: {
                     roll: String,
-                    bonus: Number
+                    bonus: {type: Number}
                 },
                 type: String
             }]
@@ -214,7 +221,7 @@ var characterSchema = mongoose.Schema({
         spells: [{
             name: String,
             page: String,
-            level: Number,
+            level: {type: Number, min: 0},
             available: Boolean
         }]
     }
