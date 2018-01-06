@@ -23,7 +23,7 @@ module.exports = function (passport) {
     opts.secretOrKey = process.env.SECRET || "thereisnosecret";
     passport
         .use(new JwtStrategy(opts, function (jwt_payload, done) {
-            User.findOne({username: jwt_payload}, function (err, user) {
+            User.findOne({_id: jwt_payload._id}, function (err, user) {
                 if (err) {
                     return done(err, false);
                 }
@@ -38,8 +38,7 @@ module.exports = function (passport) {
     passport
         .use(new LocalStrategy(
             {
-                passReqToCallback: true,
-                session: true
+                passReqToCallback: true
             },
             function (req, email, password, done) { // callback with email and password from our form
 

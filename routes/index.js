@@ -26,7 +26,7 @@ module.exports = function (app, passport) {
 
     app.post("/api/auth", function (req, res) {
         User.findOne({username: req.body.username})
-            .select("-local")
+            .select("+local +local.password")
             .exec(function (err, user) {
                 if (err) {
                     throw err;
@@ -38,9 +38,9 @@ module.exports = function (app, passport) {
                 } else {
                     // Create the JWT token
                     var token = jwt.sign(
-                        // TODO add expiresIn
-                        user.username,
-                        process.env.SECRET || "thereisnosecret");
+                        user.toObject(),
+                        process.env.SECRET || "thereisnosecret",
+                        {expiresIn: "12h"});
                     if (user.validPassword(req.body.password)) {
                         res.status(200).json({success: true, token: token, user: user});
                     } else {
