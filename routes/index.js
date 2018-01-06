@@ -25,7 +25,7 @@ module.exports = function (app, passport) {
     });
 
     app.post("/api/auth", function (req, res) {
-        User.findOneAndUpdate({username: req.body.username}, {lastLogin: new Date.now()}, {upsert: false, new: true})
+        User.findOneAndUpdate({username: req.body.username}, {lastLogin: new Date()}, {upsert: false, new: true})
             .select("+local +local.password")
             .exec(function (err, user) {
                 if (err) {
