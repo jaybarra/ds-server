@@ -12,6 +12,7 @@ var localSchema = mongoose.Schema({
 var userSchema = mongoose.Schema({
     username: {type: String, unique: true, required: true},
     joined: {type: Date, default: Date.now},
+    lastLogin: {type: Date, default: Date.now},
     local: {type: localSchema, select: false}
 });
 

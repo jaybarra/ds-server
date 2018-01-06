@@ -25,7 +25,7 @@ module.exports = function (app, passport) {
     });
 
     app.post("/api/auth", function (req, res) {
-        User.findOne({username: req.body.username})
+        User.findOneAndUpdate({username: req.body.username}, {lastLogin: new Date.now()}, {upsert: false, new: true})
             .select("+local +local.password")
             .exec(function (err, user) {
                 if (err) {
@@ -54,44 +54,55 @@ module.exports = function (app, passport) {
     });
 
     app.post("/api/signup", function (req, res) {
-        User
-            .findOne(
-                {
-                    $or: [
-                        {"local.email": req.body.email},
-                        {"username": req.body.username}
-                    ]
-                })
-            .lean()
-            .exec(function (err, user) {
-                if (err) {
-                    throw err;
-                }
-                if (!user) {
-                    var newUser = new User();
-                    newUser.username = req.body.username;
-                    newUser.local.email = req.body.email;
-                    newUser.local.password = newUser.generateHash(req.body.password);
-
-                    newUser.save(function (err) {
-                        if (err) {
-                            throw err;
-                        }
-                        res.sendStatus(200);
-                        // TODO jwt
-                    });
-                } else {
-                    var msg;
-                    if (user.username === req.body.username) {
-                        msg = "That username is taken";
-                    } else {
-                        msg = "That email already in use";
+        // TODO check on the UI as well, use regex
+        if (req.body.username.indexOf(" ") !== -1) {
+            res.status(400).json({success: false, message: "Invalid username format"});
+        } else {
+            User
+                .findOne(
+                    {
+                        $or: [
+                            {"local.email": req.body.email},
+                            {"username": req.body.username}
+                        ]
+                    })
+                .select("+local +local.password")
+                .exec(function (err, user) {
+                    if (err) {
+                        throw err;
                     }
-                    res
-                        .status(400)
-                        .json({success: false, message: msg});
-                }
-            });
+                    if (!user) {
+                        var newUser = new User();
+                        newUser.username = req.body.username;
+                        newUser.local = {
+                            email: req.body.email,
+                            password: newUser.generateHash(req.body.password)
+                        };
+
+                        newUser.save(function (err) {
+                            if (err) {
+                                throw err;
+                            }
+
+                            var token = jwt.sign(
+                                newUser.toObject(),
+                                process.env.SECRET || "thereisnosecret",
+                                {expiresIn: "12h"});
+                            res.status(200).json({success: true, token: token, user: newUser});
+                        });
+                    } else {
+                        var msg;
+                        if (user.username === req.body.username) {
+                            msg = "Sorry, that username already in use";
+                        } else {
+                            msg = "That email already in use";
+                        }
+                        res
+                            .status(400)
+                            .json({success: false, message: msg});
+                    }
+                });
+        }
     });
 
     app.get("/api/users", passport.authenticate("jwt", {session: false}), function (req, res) {
