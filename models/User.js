@@ -1,18 +1,21 @@
 // models/user.js
 
 var mongoose = require("mongoose");
+mongoose.Promise = require("bluebird");
 var bcrypt = require("bcryptjs");
 
-var userSchema = mongoose.Schema({
-    username: String,
-    joined: {type: Date, default: Date.now},
-    local: {
-        email: String,
-        password: String
-    }
+var localSchema = mongoose.Schema({
+    email: {type: String, required: true, unique: true},
+    password: {type: String, select: false, required: true}
 });
 
-// methods ====================================================================
+var userSchema = mongoose.Schema({
+    username: {type: String, unique: true, required: true},
+    joined: {type: Date, default: Date.now},
+    local: {type: localSchema, select: false}
+});
+
+// Methods ====================================================================
 /**
  *
  * @param password

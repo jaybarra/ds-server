@@ -1,6 +1,7 @@
 // models/user.js
 
 var mongoose = require("mongoose");
+mongoose.Promise = require("bluebird");
 var Schema = mongoose.Schema;
 
 var characterSchema = mongoose.Schema({
@@ -27,168 +28,168 @@ var characterSchema = mongoose.Schema({
     sex: String,
     inventory: {
         money: {
-            platinum: {type: Number, min: 0},
-            gold: {type: Number, min: 0},
-            electrum: {type: Number, min: 0},
-            silver: {type: Number, min: 0},
-            copper: {type: Number, min: 0},
+            platinum: {type: Number, min: 0, default: 0},
+            gold: {type: Number, min: 0, default: 0},
+            electrum: {type: Number, min: 0, default: 0},
+            silver: {type: Number, min: 0, default: 0},
+            copper: {type: Number, min: 0, default: 0},
             other: [{
                 name: String,
-                quantity: {type: Number},
+                quantity: {type: Number, default: 0},
                 description: String,
-                value: {type: Number}
+                value: {type: Number, default: 0}
             }]
         },
         items: [{
             name: String,
-            quantity: {type: Number},
+            quantity: {type: Number, default: 0},
             description: String
         }]
 
     },
-    experience: {type: Number},
+    experience: {type: Number, default: 0},
     stats: {
         strength: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
         dexterity: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
         constitution: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
         intelligence: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
         wisdom: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
         charisma: {
-            value: {type: Number},
-            modifier: {type: Number}
+            value: {type: Number, default: 0},
+            modifier: {type: Number, default: 0}
         },
-        passiveWisdom: {type: Number}
+        passiveWisdom: {type: Number, default: 0}
     },
     skills: {
         acrobatics: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         animalHandling: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         arcana: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         athletics: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         deception: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         history: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         insight: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         intimidation: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         investigation: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         medicine: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         nature: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         perception: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         performance: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         persuasion: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         religion: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         sleightOfHand: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         stealth: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         },
         survival: {
-            selected: Boolean,
-            value: {type: Number}
+            selected: {type: Boolean, default: false},
+            value: {type: Number, default: 0}
         }
     },
     savingThrows: {
         strength: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         },
         dexterity: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         },
         constitution: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         },
         intelligence: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         },
         wisdom: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         },
         charisma: {
-            value: {type: Number},
-            selected: Boolean
+            value: {type: Number, default: 0},
+            selected: {type: Boolean, default: false}
         }
     },
     combat: {
-        armorClass: {type: Number},
-        initiative: {type: Number},
-        speed: {type: Number},
-        currentHitPoints: {type: Number},
-        temporaryHitPoints: {type: Number},
+        armorClass: {type: Number, default: 0},
+        initiative: {type: Number, default: 0},
+        speed: {type: Number, default: 0},
+        currentHitPoints: {type: Number, default: 0},
+        temporaryHitPoints: {type: Number, default: 0},
         activeEffects: [String],
         passiveEffects: [String],
         hitDice: {
-            total: {type: Number},
+            total: {type: Number, default: 0},
             dice: [{
-                number: {type: Number},
-                die: {type: Number}
+                number: {type: Number, default: 1},
+                die: {type: Number, default: 4}
             }],
-            remaining: {type: Number}
+            remaining: {type: Number, default: 0}
         },
         deathSaves: {
             successes: {type: Number, min: 0},
@@ -202,11 +203,11 @@ var characterSchema = mongoose.Schema({
             }],
             weapons: [{
                 name: String,
-                twoHanded: Boolean,
-                attackBonus: {type: Number},
+                twoHanded: {type: Boolean, default: false},
+                attackBonus: {type: Number, default: 0},
                 damage: {
                     roll: String,
-                    bonus: {type: Number}
+                    bonus: {type: Number, default: 0}
                 },
                 type: String
             }]
@@ -216,13 +217,13 @@ var characterSchema = mongoose.Schema({
         cantrips: [{
             name: String,
             page: String,
-            available: Boolean
+            available: {type: Boolean, default: false}
         }],
         spells: [{
             name: String,
             page: String,
             level: {type: Number, min: 0},
-            available: Boolean
+            available: {type: Boolean, default: false}
         }]
     }
 });

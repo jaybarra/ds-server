@@ -25,32 +25,32 @@ module.exports = function (app, passport) {
     });
 
     app.post("/api/auth", function (req, res) {
-        User.findOne({
-            username: req.body.username
-        }, function (err, user) {
-            if (err) {
-                throw err;
-            }
-            if (!user) {
-                res
-                    .status(400)
-                    .json({success: false, message: "Authentication failed: User not Found"});
-            } else {
-                // Create the JWT token
-                var token = jwt.sign(
-                    // TODO add expiresIn
-                    user.username,
-                    process.env.SECRET || "thereisnosecret");
-                if (user.validPassword(req.body.password)) {
-                    res.status(200).json({success: true, token: token});
-                } else {
-                    res.status(400).json({
-                        success: false,
-                        message: "Authentication failed: Passwords did not match"
-                    });
+        User.findOne({username: req.body.username})
+            .select("-local")
+            .exec(function (err, user) {
+                if (err) {
+                    throw err;
                 }
-            }
-        });
+                if (!user) {
+                    res
+                        .status(400)
+                        .json({success: false, message: "Authentication failed: User not Found"});
+                } else {
+                    // Create the JWT token
+                    var token = jwt.sign(
+                        // TODO add expiresIn
+                        user.username,
+                        process.env.SECRET || "thereisnosecret");
+                    if (user.validPassword(req.body.password)) {
+                        res.status(200).json({success: true, token: token, user: user});
+                    } else {
+                        res.status(400).json({
+                            success: false,
+                            message: "Authentication failed: Passwords did not match"
+                        });
+                    }
+                }
+            });
     });
 
     app.post("/api/signup", function (req, res) {
@@ -103,6 +103,22 @@ module.exports = function (app, passport) {
                     res.json();
                 }
                 res.json(users);
+            });
+    });
+
+    app.get("/api/users/:username", function (req, res) {
+        // TODO Allow some info to anyone, more to the user themselves
+        User
+            .findOne({username: req.params.username})
+            .exec(function (err, user) {
+                if (err) {
+                    throw err;
+                }
+                if (!user) {
+                    res.status(400).json({success: false, message: "User not found"});
+                } else {
+                    res.json(user);
+                }
             });
     });
 
